@@ -4,7 +4,8 @@
 
 ### 1. Loading and Preprocessing the Data
 
-```{r}
+
+```r
 ## steps 1-2
 data <- read.csv("activity.csv", sep = ',', colClasses = c("integer", "Date", "integer"))
 ```
@@ -12,7 +13,8 @@ data <- read.csv("activity.csv", sep = ',', colClasses = c("integer", "Date", "i
 
 ### 2. Sum and Mean/Median Steps Taken Per Day
 
-```{r warning=FALSE}
+
+```r
 library(ggplot2)
 
 ## 1a) obtain complete cases (no missing steps values) from initial processed data.frame (data) 
@@ -21,15 +23,32 @@ data.na.rm <- data[!is.na(data[, 1]), ]
 ## 1b) produce histogram of total number of steps by date
 ggplot(data = data.na.rm, aes(date, steps)) + geom_col() + 
         labs(title = "Daily Steps Taken During Oct-Nov 2012")
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
+```r
 ## 2a) mean steps taken per day
 mean(data.na.rm$steps)
+```
+
+```
+## [1] 37.3826
+```
+
+```r
 ## 2b) median steps taken per day
 median(data.na.rm$steps)
 ```
 
+```
+## [1] 0
+```
+
 ### 3. Mean Daily Activity Pattern
 
-```{r}
+
+```r
 ## 1a) create data.frame object showing aggregate average steps for each unique 5-minute interval
 stepsAvg <- aggregate(data.na.rm, by = list(data.na.rm$interval), mean)[, c(4, 2)]
 
@@ -42,12 +61,21 @@ ggplot(stepsAvg, aes(interval, steps)) + geom_path() +
                  y = 175, label = "08:35")
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
 ### 4. Imputing Missing Values
 
-```{r}
+
+```r
 ## 1) determine number of missing values (complement of complete cases)
 sum(!complete.cases(data))
+```
 
+```
+## [1] 2304
+```
+
+```r
 ## 2) strategy for imputing missing steps values from initial processed data.frame (data)
 
 ## obtain cases with missing steps values (data.na) from initial processed data.frame (data) 
@@ -65,23 +93,54 @@ data.na.imp <- rbind(data[complete.cases(data), ], data.na.imp)
 ## 4a) use imputed data set (data.na.imp) to produce histogram of total number of steps by date  
 ggplot(data = data.na.imp, aes(date, steps)) + geom_col() + 
         labs(title = "Daily Steps Taken During Oct-Nov 2012")
+```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
+```r
 ## 4b) mean steps taken per day
 mean(data.na.imp$steps)
+```
+
+```
+## [1] 32.99954
+```
+
+```r
 ## 4b) median steps taken per day
 median(data.na.imp$steps)
+```
+
+```
+## [1] 0
+```
+
+```r
 ## 4c) percent difference between actual and imputed means
 actualMean <- mean(data.na.rm$steps)
 imputedMean <- mean(data.na.imp$steps)
 round(100*(actualMean-imputedMean)/actualMean,1)
+```
+
+```
+## [1] 11.7
+```
+
+```r
 ## 4d) difference between actual and imputed medians
 actualMedian <- median(data.na.rm$steps)
 imputedMedian <- median(data.na.imp$steps)
 actualMedian - imputedMedian
 ```
 
+```
+## [1] 0
+```
+
 ## 5. Activity Patterns on Weekdays and Weekends 
 
-```{r warning=FALSE}
+
+```r
 ## 1) add factor variable to imputed data (data.na.imp) indicating if date is weekend or weekday
 data.na.imp$Wknd <- as.factor(ifelse(weekdays(data.na.imp$date) %in% c("Saturday","Sunday"), 
         "Weekend", "Weekday"))
@@ -97,3 +156,5 @@ library(lattice)
 xyplot(steps ~ interval | Wknd, data = stepsMeanImp, layout = c(1, 2), 
         type = "l", main = "Mean Steps Taken by Interval during Oct-Nov 2012")
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
